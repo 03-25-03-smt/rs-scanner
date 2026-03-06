@@ -5,8 +5,11 @@
 // @description  Scans RS 3rd leg — if 3rd leg is in the future → skip. If past or behind FMC ETA → case.
 // @match        https://trans-logistics-eu.amazon.com/fmc/execution/run-structure/R-*
 // @grant        GM_addStyle
+// @grant        GM_setValue
+// @grant        GM_addValueChangeListener
 // @run-at       document-idle
 // ==/UserScript==
+
 
 /* LOADER CHECK */
 if (
@@ -23,10 +26,8 @@ throw new Error("Unauthorized environment");
 
 (async function(){
 
-const LOCAL_VERSION = 3;
-
 const CONFIG_URL =
-"https://raw.githubusercontent.com/03-25-03-smt/crid-private/main/config.json";
+"https://rs-scanner.vlad40303.workers.dev/config";
 
 const cfg = await fetch(CONFIG_URL)
 .then(r=>r.json())
@@ -35,24 +36,18 @@ const cfg = await fetch(CONFIG_URL)
 console.log("CONFIG:", cfg);
 
 if(!cfg){
-console.log("Config load failed");
+console.warn("Config load failed");
 return;
 }
 
 if(!cfg.enabled){
-alert("Script disabled by developer");
 throw new Error("Script disabled");
-}
-
-if(cfg.version !== LOCAL_VERSION){
-location.reload();
 }
 
 const expire = new Date(cfg.expire).getTime();
 
 if(Date.now() > expire){
-alert("Script expired");
-throw new Error("Expired");
+throw new Error("Script expired");
 }
 
 })();
